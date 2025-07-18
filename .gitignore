@@ -1,0 +1,21 @@
+# React Native
+node_modules/
+.expo/
+.expo-shared/
+android/
+ios/
+*.log
+*.lock
+*.tmp
+.DS_Store
+.env
+.env.*
+dist/
+build/
+coverage/
+
+# VSCode
+.vscode/
+
+# macOS
+*.DS_Store
