@@ -13,9 +13,10 @@ Une application mobile de suivi d'entraînement développée avec React Native e
 ## 📸 Screenshots
 
 <div align="center">
-  <img src="assets/screenshots/workout-details.png" width="250" alt="Détails du workout" />
-  <img src="assets/screenshots/exercise-selection.png" width="250" alt="Sélection d'exercices" />
-  <img src="assets/screenshots/workout-tracker.png" width="250" alt="Suivi en temps réel" />
+  <img src="assets/screenshots/darkmode-workout-history.png" width="200" alt="Historique des workouts" />
+  <img src="assets/screenshots/workout-details.png" width="200" alt="Détails du workout" />
+  <img src="assets/screenshots/exercise-selection.png" width="200" alt="Sélection d'exercices" />
+  <img src="assets/screenshots/workout-tracker.png" width="200" alt="Suivi en temps réel" />
 </div>
 
 ## 🛠️ Technologies utilisées
