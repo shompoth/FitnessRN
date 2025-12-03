@@ -1,9 +1,11 @@
-import { WorkoutWithExercises } from '@/types/models';
+import { ExerciseWithSets, Workout, WorkoutWithExercises } from '@/types/models';
 import {
   cleanExercise,
   getExerciseTotalWeight,
 } from '@/services/exerciseService';
 import * as Crypto from 'expo-crypto';
+import { getCurrentWorkout, getWorkouts, saveWorkout } from '@/db/workout';
+import { getExercices } from '@/db/exercices';
 
 export const getWorkoutTotalWeight = (workout: WorkoutWithExercises) => {
   return workout.exercises.reduce(
@@ -20,6 +22,9 @@ export const newWorkout = () => {
     exercises: [],
   };
 
+  // save it in database
+  saveWorkout(newWorkout);
+
   return newWorkout;
 };
 
@@ -31,6 +36,8 @@ export const finishWorkout = (workout: WorkoutWithExercises) => {
     ...cleanedWorkout,
     finishedAt: new Date(),
   };
+
+  saveWorkout(finishedWorkout);
 
   return finishedWorkout;
 };
@@ -45,3 +52,32 @@ export const cleanupWorkout = (workout: WorkoutWithExercises) => {
     exercises: cleanedExercises,
   };
 };
+
+const addExercicesToWorkout = async (workout: Workout): Promise<WorkoutWithExercises> => {
+const exercices = await getExercices(workout.id);
+const exercicesWithSets = exercices.map(e => ({...e, sets: []}));
+
+return {
+  ...workout,
+  exercises: exercicesWithSets,
+}
+}
+
+export const getCurrentWorkoutWithExercises = async (): Promise<WorkoutWithExercises | null> => {
+  const workout = await getCurrentWorkout();
+
+  if(workout) {
+    return addExercicesToWorkout(workout)
+    
+  }
+
+return null
+    
+}
+
+export const getWorkoutsWithExercises = async (): Promise<WorkoutWithExercises[]> => {
+    const workouts = await getWorkouts();
+
+    return await Promise.all(workouts.map(workout => addExercicesToWorkout(workout)))
+    
+}

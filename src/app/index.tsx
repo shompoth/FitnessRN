@@ -11,7 +11,7 @@ export default function HomeScreen() {
   const workouts = useWorkouts((state) => state.workouts);
 
   const onStartWorkout = async () => {
-    startWorkout();
+    await startWorkout();
     router.push(`/workout/current`);
   };
 

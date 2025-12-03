@@ -1,10 +1,11 @@
-import { ExerciseSet, WorkoutWithExercises } from '@/types/models';
+import { ExerciseSet, ExerciseWithSets, WorkoutWithExercises } from '@/types/models';
 import { create } from 'zustand';
-import { finishWorkout, newWorkout } from '@/services/workoutService';
+import { finishWorkout, getWorkoutsWithExercises, newWorkout } from '@/services/workoutService';
 import { createExercise } from '@/services/exerciseService';
 import { immer } from 'zustand/middleware/immer';
 import { createSet, updateSet } from '@/services/setService';
 import { current } from 'immer';
+import { getCurrentWorkoutWithExercises } from '@/services/workoutService';
 
 type State = {
   workouts: WorkoutWithExercises[];
@@ -12,6 +13,7 @@ type State = {
 };
 
 type Actions = {
+  loadWorkouts: () => void;
   startWorkout: () => void;
   finishWorkout: () => void;
   addExercise: (name: string) => void;
@@ -27,12 +29,22 @@ type Actions = {
 
 export const useWorkouts = create<State & Actions>()(
   immer((set, get) => ({
+    // states
     workouts: [],
     currentWorkout: null,
+
+    // actions
+    loadWorkouts: async () => {
+      set({ 
+        currentWorkout: await getCurrentWorkoutWithExercises(), 
+        workouts: await getWorkoutsWithExercises()
+       });
+    },
 
     startWorkout: () => {
       set({ currentWorkout: newWorkout() });
     },
+    
     finishWorkout: () => {
       const { currentWorkout } = get();
       if (!currentWorkout) {
