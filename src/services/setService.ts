@@ -25,17 +25,22 @@ export const createSet = (exerciseId: string): ExerciseSet => {
 
 export const updateSet = (
   set: ExerciseSet,
-  updatedFields: Pick<ExerciseSet, 'reps' | 'weight'>
+  updatedFields: Partial<Pick<ExerciseSet, 'reps' | 'weight'>>
 ) => {
-  const updatedSet = { ...set };
-  if (updatedFields.reps !== undefined) {
-    updatedSet.reps = updatedFields.reps;
+  const updatedSet = { ...set, ...updatedFields };
+
+  // Validation
+  if (updatedSet.reps !== undefined && updatedSet.reps < 0) {
+    updatedSet.reps = 0;
   }
-  if (updatedFields.weight !== undefined) {
-    updatedSet.weight = updatedFields.weight;
+  if (updatedSet.weight !== undefined && updatedSet.weight < 0) {
+    updatedSet.weight = 0;
   }
-  if (updatedSet.weight !== undefined && updatedSet.reps !== undefined) {
-    updatedSet.oneRM = updatedSet.weight * (36.0 / (37.0 - updatedSet.reps));
+
+  if (updatedSet.weight && updatedSet.reps && updatedSet.reps > 0) {
+    // Prevent division by zero or negative 1RM (Brzycki formula limit)
+    const effectiveReps = Math.min(updatedSet.reps, 36);
+    updatedSet.oneRM = updatedSet.weight * (36.0 / (37.0 - effectiveReps));
   }
 
   saveSet(updatedSet);

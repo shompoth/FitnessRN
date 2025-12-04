@@ -1,6 +1,6 @@
 import { View, Text, TextInput } from '@/components/general/Themed';
 import { ExerciseSet } from '@/types/models';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { StyleSheet } from 'react-native';
 // TODO: In newer version of GH, import the Reanimated version
 // import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
@@ -20,12 +20,45 @@ export default function SetItem({ index, set }: SetItem) {
   const updateSet = useWorkouts((state) => state.updateSet);
   const deleteSet = useWorkouts((state) => state.deleteSet);
 
-  const handleWeightChange = () => {
-    updateSet(set.id, { weight: parseFloat(weight) });
+  const weightTimerRef = useRef<NodeJS.Timeout>(null);
+  const repsTimerRef = useRef<NodeJS.Timeout>(null);
+
+  const handleWeightChange = (val: string) => {
+    setWeight(val);
+    if (weightTimerRef.current) clearTimeout(weightTimerRef.current);
+    weightTimerRef.current = setTimeout(() => {
+      const parsed = parseFloat(val);
+      if (!isNaN(parsed) && parsed >= 0) {
+        updateSet(set.id, { weight: parsed });
+      }
+    }, 500);
   };
 
-  const handleRepsChange = () => {
-    updateSet(set.id, { reps: parseInt(reps) });
+  const handleWeightBlur = () => {
+    if (weightTimerRef.current) clearTimeout(weightTimerRef.current);
+    const parsed = parseFloat(weight);
+    if (!isNaN(parsed) && parsed >= 0) {
+      updateSet(set.id, { weight: parsed });
+    }
+  };
+
+  const handleRepsChange = (val: string) => {
+    setReps(val);
+    if (repsTimerRef.current) clearTimeout(repsTimerRef.current);
+    repsTimerRef.current = setTimeout(() => {
+      const parsed = parseInt(val);
+      if (!isNaN(parsed) && parsed >= 0) {
+        updateSet(set.id, { reps: parsed });
+      }
+    }, 500);
+  };
+
+  const handleRepsBlur = () => {
+    if (repsTimerRef.current) clearTimeout(repsTimerRef.current);
+    const parsed = parseInt(reps);
+    if (!isNaN(parsed) && parsed >= 0) {
+      updateSet(set.id, { reps: parsed });
+    }
   };
 
   const renderRightActions = () => (
@@ -46,18 +79,18 @@ export default function SetItem({ index, set }: SetItem) {
         <TextInput
           placeholder="50"
           value={weight}
-          onChangeText={setWeight}
+          onChangeText={handleWeightChange}
           style={styles.input}
           keyboardType="numeric"
-          onBlur={handleWeightChange}
+          onBlur={handleWeightBlur}
         />
         <TextInput
           placeholder="8"
           value={reps}
-          onChangeText={setReps}
+          onChangeText={handleRepsChange}
           style={styles.input}
           keyboardType="numeric"
-          onBlur={handleRepsChange}
+          onBlur={handleRepsBlur}
         />
       </View>
     </Swipeable>
